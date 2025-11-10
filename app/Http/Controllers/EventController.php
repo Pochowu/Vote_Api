@@ -24,7 +24,7 @@ class EventController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
+    */
 
     //  Créer un nouvel événement
     public function store(Request $request)
@@ -66,9 +66,10 @@ class EventController extends Controller
 
         }
     }
-     /**
-     * Display the specified resource.
-     */
+    
+    /**
+    * Display the specified resource.
+    */
 
     //  Afficher un événement par ID
     public function show(string $id)
@@ -87,9 +88,10 @@ class EventController extends Controller
             'data' => $events
         ], 200);
     }
+
     /**
-     * Update the specified resource in storage.
-     */
+    * Update the specified resource in storage.
+    */
 
     //  Mettre à jour un événement
    public function update(Request $request, string $id)
@@ -140,9 +142,11 @@ class EventController extends Controller
 
         }
     }
+
     /**
-     * Remove the specified resource from storage.
-     */
+    * Remove the specified resource from storage.
+    */
+
     //  Supprimer un événement
     public function destroy($id)
     {
