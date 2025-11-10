@@ -4,62 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Vote;
 use Illuminate\Http\Request;
+use App\Models\Candidate;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class VoteController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Enregistre un nouveau vote pour un candidat donné.
+     * Endpoint: POST /api/candidates/{candidatId}/votes
      */
-    public function index()
+    public function store(Request $request, $candidatId)
     {
-        //
-    }
+        // 1. Validation des données
+        $request->validate([
+            'amount' => 'required|string',
+            'voting_name' => 'required|string|max:255',
+            'votes_number' => 'required|integer|min:1',
+            'payment_method' => ['required', Rule::in(['mix_by_yas', 'flooz'])],
+            'phone_number' => 'nullable|string|max:255',
+        ]);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        // 2. Vérification du Candidat
+        $candidat = Candidate::findOrFail($candidatId);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // 3. Logique de Transaction
+        try {
+            DB::beginTransaction();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Vote $vote)
-    {
-        //
-    }
+            // Création de l'entrée de vote
+            $vote = Vote::create([
+                'event_id' => $candidat->event_id, // Récupération automatique de l'event_id
+                'candidat_id' => $candidatId,
+                'amount' => $request->amount,
+                'voting_name' => $request->voting_name,
+                'votes_number' => $request->votes_number,
+                'payment_method' => $request->payment_method,
+                'phone_number' => $request->phone_number,
+            ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Vote $vote)
-    {
-        //
-    }
+            // Mise à jour du compteur de votes du candidat
+            $candidat->votes_count += $request->votes_number;
+            $candidat->save();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Vote $vote)
-    {
-        //
-    }
+            DB::commit();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Vote $vote)
-    {
-        //
+            // 4. Réponse
+            return response()->json([
+                'message' => 'Vote enregistré et compté avec succès.',
+                'vote' => $vote
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Erreur lors de l\'enregistrement du vote.', 'error' => $e->getMessage()], 500);
+        }
     }
 }
