@@ -4,62 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Afficher la liste des admins
     public function index()
     {
-        //
+        $admins = Admin::all();
+        return response()->json($admins);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Créer un nouvel admin
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'email' => 'required|email|unique:admins',
+            'password' => 'required|min:6',
+        ]);
+
+        $admin = Admin::create([
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json($admin, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Afficher un admin spécifique
     public function show(Admin $admin)
     {
-        //
+        return response()->json($admin);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Admin $admin)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
+    // Mettre à jour un admin
     public function update(Request $request, Admin $admin)
     {
-        //
+        $request->validate([
+            'email' => 'sometimes|email|unique:admins,email,' . $admin->id,
+            'password' => 'sometimes|min:6',
+        ]);
+
+        if ($request->has('password')) {
+            $request->merge(['password' => Hash::make($request->password)]);
+        }
+
+        $admin->update($request->all());
+
+        return response()->json($admin);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Supprimer un admin
     public function destroy(Admin $admin)
     {
-        //
+        $admin->delete();
+        return response()->json(null, 204);
     }
 }
