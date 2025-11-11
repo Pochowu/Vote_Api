@@ -3,92 +3,115 @@
 namespace App\Http\Controllers;
 
 use App\Models\Candidate;
-use App\Models\Event;
-use Illuminate\Container\Attributes\Storage;
 use Illuminate\Http\Request;
 
 class CandidateController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lister tous les candidats
      */
     public function index()
     {
-        $candidates = Candidate::all();
-        return view('candidates.index',[
-        'candidates' => $candidates,
+        $candidates = Candidate::with('event')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $candidates,
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-         return view('candidates.create',[
-         'events' =>Event::all()
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     *  Créer un nouveau candidat
      */
     public function store(Request $request)
     {
-           $request->validate([
-          'name' => 'required',
-          'description' => 'required',
-          'photo' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
+        $validated = $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'photo' => 'required|string|max:5100', // ici on attend juste une URL ou un nom d'image
+            'votes_count' => 'required|int'
         ]);
 
-        
-        if ($request->hasFile('photo')) {
-            $validated ['photo'] = $request->file('photo')->store('candidates', 'public');
-        }
+        $candidate = Candidate::create($validated);
 
-        Candidate::create([
-            'name' =>$request->name,
-            'event_id' =>$request->event_id,
-            'description' =>$request->description,
-            'photo' =>$request->photo,
-            'votes_count' =>$request->votes_count,
-        ]);
-         return redirect()->route('candidates.index')->with('success',"candidat ajoutée avec succes ");
-
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Candidat créé avec succès ',
+            'data' => $candidate,
+        ], 201);
     }
 
     /**
-     * Update the specified resource in storage.
+     * 🔍 Afficher un candidat spécifique
      */
-    public function update(Request $request, string $id)
+    public function show($id)
     {
-        $request->validate([
-            'name' => 'required|max:225',
-            'photo' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
-        ]);
+        $candidate = Candidate::with('event')->find($id);
 
-        Candidate::find($id)->update([
-            'name'=>$request->name,
-            'category_id' =>$request->category_id,
-            'description'=>$request->description,
-            'photo'=>$request->photo,
-            'votes_count'=>$request->votes_count,
-        ]);
-
-        if ($request->hasFile('photo')) {
-           $validated ['photo'] = $request->file('photo')->store('candidates', 'public');
+        if (!$candidate) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Candidat introuvable ',
+            ], 404);
         }
- 
-        return back()->with('success',"candidat mis a jour avec succés");
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $candidate,
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     *  Mettre à jour un candidat
      */
-    public function destroy(string $id) {
-        {
-          Candidate::find($id)->delete();
-          return redirect()->route('candidates.index')->with('success',"candidat supprimée  avec success");
+    public function update(Request $request, $id)
+    {
+        $candidate = Candidate::find($id);
+
+        if (!$candidate) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Candidat introuvable ',
+            ], 404);
         }
+
+        $validated = $request->validate([
+            'event_id' => 'sometimes|exists:events,id',
+            'name' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'photo' => 'required|string|max:5100',
+            'votes_count' => 'required|int'
+        ]);
+
+        $candidate->update($validated);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Candidat mis à jour avec succès ',
+            'data' => $candidate,
+        ]);
+    }
+
+    /**
+     *  Supprimer un candidat
+     */
+    public function destroy($id)
+    {
+        $candidate = Candidate::find($id);
+
+        if (!$candidate) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Candidat introuvable ',
+            ], 404);
+        }
+
+        $candidate->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Candidat supprimé avec succès ',
+        ]);
     }
 }

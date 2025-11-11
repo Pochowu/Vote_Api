@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignIdFor(Event::class);
-            $table->text('description');
+            $table->string('description')->nullable();
             $table->string('photo');
             $table->int('votes_count');
             $table->timestamps();
