@@ -18,7 +18,12 @@ class Event extends Model
         'status',
     ];
 
-   
+    public function admins()
+    {
+        return $this->belongsTo(Admin::class);
+    }
+
+
     public function candidates()
     {
         return $this->hasMany(Candidate::class, 'event_id');

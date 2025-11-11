@@ -153,16 +153,17 @@ class EventController extends Controller
         $events = Event::find($id);
 
         if (!$events) {
-           return response()->json([
-            'success' => false,
-            'message' => 'Événement non trouvé'
-        ], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Événement non trouvé'
+            ], 404);
+        }
 
         $events->delete();
+        
         return response()->json([
-        'success' => true,
-        'message' => 'Événement supprimé avec succès'
-    ], 200);
+            'success' => true,
+            'message' => 'Événement supprimé avec succès'
+        ], 200);
     }
-}
 }
