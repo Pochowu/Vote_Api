@@ -27,10 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AdminController::class, 'logout']);
 
     // Gestion des concours
-    Route::apiResource('/events', EventController::class)->except(['index', 'show']);
+    Route::apiResource('/events', EventController::class);
 
     // Gestion des candidats
-    Route::apiResource('/candidates', CandidateController::class)->except(['show']);
+    Route::apiResource('/candidates', CandidateController::class);
     
     // Gestion des votes (consultation / stats)
     Route::get('/votes', [VoteController::class, 'index']);
