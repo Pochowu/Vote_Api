@@ -29,4 +29,9 @@ class Event extends Model
         return $this->hasMany(Candidate::class, 'event_id');
     }
    
+    public function votes()
+    {
+        return $this->belongsTo(Vote::class);
+    }
+   
 }
