@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Candidate;
 use App\Models\Event;
+use Illuminate\Container\Attributes\Storage;
 use Illuminate\Http\Request;
 
 class CandidateController extends Controller
@@ -15,7 +16,7 @@ class CandidateController extends Controller
     {
         $candidates = Candidate::all();
         return view('candidates.index',[
-            'candidates' => $candidates,
+        'candidates' => $candidates,
         ]);
     }
 
@@ -24,7 +25,7 @@ class CandidateController extends Controller
      */
     public function create()
     {
-        return view('candidates.create',[
+         return view('candidates.create',[
          'events' =>Event::all()
         ]);
     }
@@ -34,7 +35,7 @@ class CandidateController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+           $request->validate([
           'name' => 'required',
           'description' => 'required',
           'photo' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
@@ -47,35 +48,12 @@ class CandidateController extends Controller
 
         Candidate::create([
             'name' =>$request->name,
-            'event_id' =>$request->Event_id,
+            'event_id' =>$request->event_id,
             'description' =>$request->description,
             'photo' =>$request->photo,
             'votes_count' =>$request->votes_count,
         ]);
          return redirect()->route('candidates.index')->with('success',"candidat ajoutée avec succes ");
-    }
- 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-            $candidate =Candidate::find($id);
-        return view('candidates.show',[
-            'candidate' => $candidate,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $candidate =Candidate::find($id);
-        return view('candidates.edit',[
-            'candidate' => $candidate,
-             'events'=>Event::all()
-        ]);
 
     }
 
@@ -84,45 +62,33 @@ class CandidateController extends Controller
      */
     public function update(Request $request, string $id)
     {
-      
-
-     
-   $request->validate([
+        $request->validate([
             'name' => 'required|max:225',
             'photo' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
-       Candidate::find($id)->update([
-        'name'=>$request->name,
-        'category_id' =>$request->category_id,
-        'description'=>$request->description,
-        'photo'=>$request->photo,
-        'votes_count'=>$request->votes_count,
+        Candidate::find($id)->update([
+            'name'=>$request->name,
+            'category_id' =>$request->category_id,
+            'description'=>$request->description,
+            'photo'=>$request->photo,
+            'votes_count'=>$request->votes_count,
+        ]);
 
-
-       ]);
         if ($request->hasFile('photo')) {
-            $validated ['photo'] = $request->file('photo')->store('candidates', 'public');
+           $validated ['photo'] = $request->file('photo')->store('candidates', 'public');
         }
-
-     
-       
-
-      
-       return back()->with('success',"candidat mis a jour avec succés");
-
-       
  
+        return back()->with('success',"candidat mis a jour avec succés");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-           {
-      Candidate::find($id)->delete();
-      return redirect()->route('candidates.index')->with('success',"candidat supprimée  avec success");
-    }
+    public function destroy(string $id) {
+        {
+          Candidate::find($id)->delete();
+          return redirect()->route('candidates.index')->with('success',"candidat supprimée  avec success");
+        }
     }
 }
