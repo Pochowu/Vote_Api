@@ -9,57 +9,161 @@ class EventController extends Controller
 {
     /**
      * Display a listing of the resource.
-     */
+    */
+    
+    // Lister tous les événements
     public function index()
     {
-        //
-    }
+        $events = Event::all();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'data' => $events
+        ], 200);
     }
 
     /**
      * Store a newly created resource in storage.
-     */
+    */
+
+    //  Créer un nouvel événement
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|text',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'vote_amount' => 'nullable|string',
+            'status' => 'required|string'
+        ]);
+
+        try {
+           $data = [
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'start_date' => $request->input('start_date'),
+                'end_date' => $request->input('end_date'),
+                'vote_amount' => $request->input('vote_amount'),
+                'status' => $request->input('status'),
+            ];
+
+            $events = Event::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Événement créé avec succès',
+                'data' => $events
+            ], 201);
+
+        
+        } catch (\Exception $ex) {
+            return response()->json([
+            'success' => false,
+            'message' => 'Erreur lors de la création',
+            'error' => $ex->getMessage()
+        ], 500);
+
+        }
+    }
+    
+    /**
+    * Display the specified resource.
+    */
+
+    //  Afficher un événement par ID
+    public function show(string $id)
+    {
+        $events = Event::find($id);
+
+        if (!$events) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Événement non trouvé'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $events
+        ], 200);
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Event $event)
+    * Update the specified resource in storage.
+    */
+
+    //  Mettre à jour un événement
+   public function update(Request $request, string $id)
     {
-        //
+         $events = Event::find($id);
+
+        if (!$events) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Événement non trouvé'
+            ], 404);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|text',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'vote_amount' => 'nullable|string',
+            'status' => 'required|string'
+        ]);
+
+        try {
+           $data = [
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'start_date' => $request->input('start_date'),
+                'end_date' => $request->input('end_date'),
+                'vote_amount' => $request->input('vote_amount'),
+                'status' => $request->input('status'),
+            ];
+
+            $events->update($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Événement mis à jour avec succès',
+                'data' => $events
+            ], 201);
+
+        
+        } catch (\Exception $ex) {
+            return response()->json([
+            'success' => false,
+            'message' => 'Erreur lors de la mise à jour',
+            'error' => $ex->getMessage()
+        ], 500);
+
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Event $event)
-    {
-        //
-    }
+    * Remove the specified resource from storage.
+    */
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Event $event)
+    //  Supprimer un événement
+    public function destroy($id)
     {
-        //
-    }
+        $events = Event::find($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Event $event)
-    {
-        //
+        if (!$events) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Événement non trouvé'
+            ], 404);
+        }
+
+        $events->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Événement supprimé avec succès'
+        ], 200);
     }
 }
