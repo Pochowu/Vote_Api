@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\VoteController;
+use App\Http\Controllers\PaymentController;
 
 
 // Authentification admin
@@ -35,8 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Gestion des votes (consultation / stats)
     Route::get('/votes', [VoteController::class, 'index']);
     Route::get('/votes/statistics', [VoteController::class, 'statistics']);
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\AdminController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -44,7 +43,6 @@ Route::get('/user', function (Request $request) {
 
 // Routes pour la gestion des admins
 //Route::apiResource('admins', AdminController::class);
-
 
 Route::prefix('payments')->group(function () {
     Route::post('/initiate', [PaymentController::class, 'initiatePayment']);
