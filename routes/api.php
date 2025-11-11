@@ -37,6 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/votes', [VoteController::class, 'index']);
     Route::get('/votes/statistics', [VoteController::class, 'statistics']);
 
+});
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -50,3 +52,5 @@ Route::prefix('payments')->group(function () {
     Route::get('/status/{reference}', [PaymentController::class, 'checkPaymentStatus']);
     Route::post('/webhook', [PaymentController::class, 'webhookHandler']);
 });
+
+
