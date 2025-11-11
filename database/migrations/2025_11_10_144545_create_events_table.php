@@ -15,7 +15,7 @@ return new class extends Migration
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->string('vote_amount');
-            $table->enum('status', ['en_cours', 'annule', 'termine'])->default('en_cours');
+            $table->enum('status', ['en_cours', 'annule', 'reporte', 'termine'])->default('en_cours');
             $table->timestamps();
         });
     }
