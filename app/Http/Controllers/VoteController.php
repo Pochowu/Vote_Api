@@ -22,7 +22,7 @@ class VoteController extends Controller
             'voting_name' => 'required|string|max:255',
             'votes_number' => 'required|integer|min:1',
             'payment_method' => ['required', Rule::in(['mix_by_yas', 'flooz'])],
-            'phone_number' => 'nullable|string|max:255',
+            'phone_number' => 'required|string|max:255',
         ]);
 
         // 2. Vérification du Candidat

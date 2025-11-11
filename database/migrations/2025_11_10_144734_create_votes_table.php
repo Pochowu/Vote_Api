@@ -20,10 +20,10 @@ return new class extends Migration
 
             // Champs spécifiques au vote
             $table->string('amount');
-            $table->string('voting_name');
+            $table->string('voting_name')->nullable();
             $table->integer('votes_number')->default(1);
             $table->enum('payment_method', ['mix_by_yas', 'flooz']);
-            $table->string('phone_number')->nullable();
+            $table->string('phone_number')->required();
 
             $table->timestamps();
         });
