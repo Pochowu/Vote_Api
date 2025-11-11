@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('votes', function (Blueprint $table) {
             $table->id();
+
+            // Clés étrangères
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+            $table->foreignId('candidat_id')->constrained('candidats')->onDelete('cascade');
+
+            // Champs spécifiques au vote
+            $table->string('amount');
+            $table->string('voting_name')->nullable();
+            $table->integer('votes_number')->default(1);
+            $table->enum('payment_method', ['mix_by_yas', 'flooz']);
+            $table->string('phone_number')->required();
+
             $table->timestamps();
         });
     }
