@@ -26,6 +26,6 @@ class Admin extends Authenticatable
 
     public function candidates()
     {
-        return $this->hasMany(Candidate::class, 'event_id');
+        return $this->hasMany(Candidate::class);
     }
 }
