@@ -9,4 +9,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Routes pour la gestion des admins
-Route::apiResource('admins', AdminController::class);
+//Route::apiResource('admins', AdminController::class);

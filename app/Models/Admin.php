@@ -18,4 +18,14 @@ class Admin extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function candidates()
+    {
+        return $this->hasMany(Candidate::class, 'event_id');
+    }
 }
