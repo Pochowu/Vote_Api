@@ -6,5 +6,29 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vote extends Model
 {
-    //
+    protected $fillable = [
+        'event_id',
+        'candidate_id',
+        'amount',
+        'voting_name',
+        'votes_number',
+        'payment_method',
+        'phone_number',
+        'payment_reference', // Nouveau
+        'payment_status', // Nouveau: pending, paid, failed
+    ];
+
+    protected $casts = [
+        'payment_status' => 'string'
+    ];
+
+    public function candidate()
+    {
+        return $this->belongsTo(Candidate::class);
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }
