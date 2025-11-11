@@ -31,7 +31,7 @@ class Event extends Model
    
     public function votes()
     {
-        return $this->belongsTo(Vote::class);
+        return $this->hasMany(Vote::class);
     }
    
 }
