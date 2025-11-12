@@ -24,11 +24,11 @@ Route::get('/candidates/{id}', [CandidateController::class, 'show']);
 Route::post('/votes', [VoteController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('/events', EventController::class);
 
     Route::post('/logout', [AdminController::class, 'logout']);
 
     // Gestion des concours
-    Route::apiResource('/events', EventController::class);
 
     // Gestion des candidats
     Route::apiResource('/candidates', CandidateController::class);
