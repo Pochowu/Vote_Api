@@ -31,10 +31,10 @@ class EventController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'nullable|text',
+            'description' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'vote_amount' => 'nullable|string',
+            'vote_amount' => 'required|string',
             'status' => 'required|string'
         ]);
 
@@ -96,7 +96,7 @@ class EventController extends Controller
     //  Mettre à jour un événement
    public function update(Request $request, string $id)
     {
-         $events = Event::find($id);
+        $events = Event::find($id);
 
         if (!$events) {
             return response()->json([
@@ -105,12 +105,12 @@ class EventController extends Controller
             ], 404);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'nullable|text',
+            'description' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'vote_amount' => 'nullable|string',
+            'vote_amount' => 'required|string',
             'status' => 'required|string'
         ]);
 
@@ -148,22 +148,41 @@ class EventController extends Controller
     */
 
     //  Supprimer un événement
+    // public function destroy($id)
+    // {
+    //     $events = Event::find($id);
+
+    //     if (!$events) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Événement non trouvé'
+    //         ], 404);
+    //     }
+
+    //     $events->delete();
+        
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Événement supprimé avec succès'
+    //     ], 200);
+    // }
+
     public function destroy($id)
     {
-        $events = Event::find($id);
+        $event = Event::find($id);
 
-        if (!$events) {
+        if (!$event) {
             return response()->json([
                 'success' => false,
-                'message' => 'Événement non trouvé'
+                'message' => 'Événement non trouvé ❌'
             ], 404);
         }
 
-        $events->delete();
-        
+        $event->delete(); // grâce à onDelete('cascade'), les candidats seront aussi supprimés
+
         return response()->json([
             'success' => true,
-            'message' => 'Événement supprimé avec succès'
+            'message' => 'Événement supprimé avec succès 🗑️'
         ], 200);
     }
 }
