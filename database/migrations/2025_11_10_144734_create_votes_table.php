@@ -16,7 +16,7 @@ return new class extends Migration
 
             // Clés étrangères
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-            $table->foreignId('candidat_id')->constrained('candidats')->onDelete('cascade');
+            $table->foreignId('candidate_id')->constrained('candidates')->onDelete('cascade');
 
             // Champs spécifiques au vote
             $table->string('amount');

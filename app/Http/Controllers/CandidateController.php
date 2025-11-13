@@ -12,7 +12,9 @@ class CandidateController extends Controller
      */
     public function index()
     {
-        $candidates = Candidate::with('event')->get();
+        // $candidates = Candidate::with('event')->get();
+        
+        return response()->json(Candidate::all(),200);
 
         return response()->json([
             'status' => 'success',
@@ -45,21 +47,21 @@ class CandidateController extends Controller
     /**
      * 🔍 Afficher un candidat spécifique
      */
-    public function show($id)
+    public function show(string $id)
     {
-        $candidate = Candidate::with('event')->find($id);
+        $candidate = Candidate::find($id);
 
         if (!$candidate) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Candidat introuvable ',
+                'success' => false,
+                'message' => 'Candidat non trouvé'
             ], 404);
         }
 
         return response()->json([
-            'status' => 'success',
-            'data' => $candidate,
-        ]);
+            'success' => true,
+            'data' => $candidate
+        ], 200);
     }
 
     /**

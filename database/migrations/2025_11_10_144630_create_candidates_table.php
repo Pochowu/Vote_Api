@@ -15,10 +15,11 @@ return new class extends Migration
         Schema::create('candidates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignIdFor(Event::class);
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+            // $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
             $table->string('description')->nullable();
             $table->string('photo');
-            $table->int('votes_count');
+            $table->integer('votes_count')->default(0);
             $table->timestamps();
         });
     }

@@ -13,12 +13,15 @@ use App\Http\Controllers\PaymentController;
 Route::post('/login', [AdminController::class, 'login']);
 
 // Liste publique des concours (événements)
-Route::get('/events', [EventController::class, 'index']);
-Route::get('/events/{id}', [EventController::class, 'show']);
+// Route::get('/events', [EventController::class, 'index']);
+// Route::get('/events/{id}', [EventController::class, 'show']);
+
+Route::apiResource('/events', EventController::class);
+Route::apiResource('/candidates', CandidateController::class);
 
 // Liste des candidats d’un concours
-Route::get('/events/{event_id}/candidates', [CandidateController::class, 'getByEvent']);
-Route::get('/candidates/{id}', [CandidateController::class, 'show']);
+// Route::get('/events/{event_id}/candidates', [CandidateController::class, 'getByEvent']);
+// Route::get('/candidates/{id}', [CandidateController::class, 'show']);
 
 // Enregistrement d’un vote (sans compte)
 Route::post('/votes', [VoteController::class, 'store']);
@@ -28,10 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AdminController::class, 'logout']);
 
     // Gestion des concours
-    Route::apiResource('/events', EventController::class);
+    
 
     // Gestion des candidats
-    Route::apiResource('/candidates', CandidateController::class);
+    
     
     // Gestion des votes (consultation / stats)
     Route::get('/votes', [VoteController::class, 'index']);
