@@ -148,41 +148,26 @@ class EventController extends Controller
     */
 
     //  Supprimer un événement
-    // public function destroy($id)
-    // {
-    //     $events = Event::find($id);
+    
 
-    //     if (!$events) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Événement non trouvé'
-    //         ], 404);
-    //     }
-
-    //     $events->delete();
-        
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Événement supprimé avec succès'
-    //     ], 200);
-    // }
-
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $event = Event::find($id);
+        $events = Event::find($id);
 
-        if (!$event) {
+        if (!$events) {
             return response()->json([
                 'success' => false,
-                'message' => 'Événement non trouvé ❌'
+                'message' => 'Événement non trouvé'
             ], 404);
         }
 
-        $event->delete(); // grâce à onDelete('cascade'), les candidats seront aussi supprimés
+        $events->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Événement supprimé avec succès 🗑️'
+            'message' => 'Événement supprimé avec succès'
         ], 200);
     }
+
+    
 }

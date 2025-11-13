@@ -14,7 +14,7 @@ Route::post('/login', [AdminController::class, 'login']);
 
 // Liste publique des concours (événements)
 // Route::get('/events', [EventController::class, 'index']);
-Route::get('/events/{id}', [EventController::class, 'show']);
+// Route::get('/events/{id}', [EventController::class, 'show']);
 
 Route::apiResource('/events', EventController::class);
 Route::apiResource('/candidates', CandidateController::class);
