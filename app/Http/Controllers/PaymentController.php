@@ -13,8 +13,8 @@ class PaymentController extends Controller
     public function __construct()
     {
         // Configuration de FedaPay
-        FedaPay::setApiKey(env('FEDAPAY_SECRET_KEY'));
-        FedaPay::setEnvironment(env('FEDAPAY_ENVIRONMENT', 'sandbox'));
+        FedaPay::setApiKey(env('sk_sandbox_MN6v2i8ONTKgi31_PdFwIr1H'));
+        FedaPay::setEnvironment(env('sandbox'));
     }
 
     /**
@@ -25,8 +25,12 @@ class PaymentController extends Controller
         $request->validate([
             'vote_id' => 'required|exists:votes,id',
             'amount' => 'required|numeric',
+            'candidate_id' => 'required|exists:candidates,id',
+            'full_name' => 'required|string',
+            'phone_number' => 'required|string',
+            'vote_number' => 'required|integer|min:1',
             'currency' => 'required|in:XOF,USD,EUR',
-            'callback_url' => 'required|url',
+            //'callback_url' => 'required|url',
         ]);
 
         try {
@@ -40,7 +44,7 @@ class PaymentController extends Controller
                 'customer' => [
                     'firstname' => $vote->voting_name,
                     'lastname' => 'Voter',
-                    'email' => 'voter@example.com', // À adapter
+                    'email' => 'kokoubernardabeni@gmail.com', // À adapter
                     'phone_number' => [
                         'number' => $vote->phone_number,
                         'country' => 'TG' // Togo par défaut
@@ -58,6 +62,7 @@ class PaymentController extends Controller
                 'success' => true,
                 'payment_url' => $transaction->generateToken(),
                 'reference' => $transaction->reference,
+                'amount' => $request->amount,
                 'message' => 'Paiement initié avec succès'
             ]);
         } catch (\Exception $e) {
