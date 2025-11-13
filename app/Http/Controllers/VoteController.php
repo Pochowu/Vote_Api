@@ -12,12 +12,15 @@ class VoteController extends Controller
 {
     /**
      * Enregistre un nouveau vote pour un candidat donné.
-     * Endpoint: POST /api/candidates/{candidatId}/votes
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $candidatId)
+    public function store(Request $request)
     {
-        // 1. Validation des données
+        // 1. Validation des données de la requête
         $request->validate([
+            'candidate_id' => 'required|exists:candidates,id',
             'amount' => 'required|string',
             'voting_name' => 'required|string|max:255',
             'votes_number' => 'required|integer|min:1',
@@ -25,17 +28,17 @@ class VoteController extends Controller
             'phone_number' => 'required|string|max:255',
         ]);
 
-        // 2. Vérification du Candidat
-        $candidat = Candidate::findOrFail($candidatId);
+        // 2. Récupération du candidat
+        $candidate = Candidate::findOrFail($request->input('candidate_id'));
 
-        // 3. Logique de Transaction
+        // 3. Utilisation d'une transaction pour garantir l'intégrité des données
         try {
             DB::beginTransaction();
 
-            // Création de l'entrée de vote
+            // Création de l'enregistrement de vote
             $vote = Vote::create([
-                'event_id' => $candidat->event_id, // Récupération automatique de l'event_id
-                'candidat_id' => $candidatId,
+                'event_id' => $candidate->event_id,
+                'candidate_id' => $candidate->id,
                 'amount' => $request->amount,
                 'voting_name' => $request->voting_name,
                 'votes_number' => $request->votes_number,
@@ -43,20 +46,21 @@ class VoteController extends Controller
                 'phone_number' => $request->phone_number,
             ]);
 
-            // Mise à jour du compteur de votes du candidat
-            $candidat->votes_count += $request->votes_number;
-            $candidat->save();
+            // Incrémentation du compteur de votes du candidat
+            $candidate->increment('votes_count', $request->votes_number);
 
             DB::commit();
 
-            // 4. Réponse
+            // 4. Réponse en cas de succès
             return response()->json([
                 'message' => 'Vote enregistré et compté avec succès.',
                 'vote' => $vote
             ], 201);
 
         } catch (\Exception $e) {
+            // En cas d'erreur, on annule la transaction
             DB::rollBack();
+            // Et on retourne une réponse d'erreur
             return response()->json(['message' => 'Erreur lors de l\'enregistrement du vote.', 'error' => $e->getMessage()], 500);
         }
     }

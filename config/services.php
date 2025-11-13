@@ -39,8 +39,7 @@ return [
     /** Configuration de Moyens de paiement de FedaPay */
     'fedapay' => [
         'public_key' => env('FEDAPAY_PUBLIC_KEY'),
-        'private_key' => env('FEDAPAY_PRIVATE_KEY'),
-        //'secret_key' => env('FEDAPAY_SECRET_KEY'),
+        'secret_key' => env('FEDAPAY_SECRET_KEY'),
         'environment' => env('FEDAPAY_ENVIRONMENT', 'sandbox'),
     ],
 ];

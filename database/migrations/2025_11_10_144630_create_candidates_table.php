@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignIdFor(Event::class);
             $table->string('description')->nullable();
             $table->string('photo');
-            $table->int('votes_count');
+            // Initialiser le compteur de votes à 0
+            $table->integer('votes_count')->default(0);
             $table->timestamps();
         });
     }

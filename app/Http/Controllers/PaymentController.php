@@ -13,8 +13,8 @@ class PaymentController extends Controller
     public function __construct()
     {
         // Configuration de FedaPay
-        FedaPay::setApiKey(env('FEDAPAY_SECRET_KEY'));
-        FedaPay::setEnvironment(env('FEDAPAY_ENVIRONMENT', 'sandbox'));
+        FedaPay::setApiKey(config('services.fedapay.secret_key'));
+        FedaPay::setEnvironment(config('services.fedapay.environment', 'sandbox'));
     }
 
     /**
@@ -73,28 +73,18 @@ class PaymentController extends Controller
      */
     public function paymentCallback(Request $request): JsonResponse
     {
+        // Validation de la requête de callback
         $request->validate([
             'reference' => 'required|string',
             'status' => 'required|in:approved,canceled,declined'
         ]);
 
         try {
+            // Récupération du vote par sa référence de paiement
             $vote = Vote::where('payment_reference', $request->reference)->firstOrFail();
 
-            if ($request->status === 'approved') {
-                $vote->update([
-                    'payment_status' => 'paid',
-                    'status' => 'confirmed'
-                ]);
-
-                // Incrémenter le nombre de votes du candidat
-                $vote->candidate->increment('votes_count', $vote->votes_number);
-            } else {
-                $vote->update([
-                    'payment_status' => 'failed',
-                    'status' => 'cancelled'
-                ]);
-            }
+            // Mise à jour du statut du vote
+            $this->updateVoteStatus($vote, $request->status);
 
             return response()->json([
                 'success' => true,
@@ -105,6 +95,32 @@ class PaymentController extends Controller
                 'success' => false,
                 'message' => 'Erreur lors du traitement du callback: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Met à jour le statut d'un vote en fonction du statut du paiement.
+     *
+     * @param Vote $vote
+     * @param string $paymentStatus
+     * @return void
+     */
+    private function updateVoteStatus(Vote $vote, string $paymentStatus): void
+    {
+        if ($paymentStatus === 'approved') {
+            // Si le paiement est approuvé, on met à jour le statut du vote et on incrémente les votes du candidat
+            $vote->update([
+                'payment_status' => 'paid',
+                'status' => 'confirmed'
+            ]);
+
+            $vote->candidate->increment('votes_count', $vote->votes_number);
+        } else {
+            // Si le paiement a échoué ou a été annulé, on met à jour le statut du vote
+            $vote->update([
+                'payment_status' => 'failed',
+                'status' => 'cancelled'
+            ]);
         }
     }
 
@@ -134,24 +150,20 @@ class PaymentController extends Controller
      */
     public function webhookHandler(Request $request): JsonResponse
     {
-        // Vérifier la signature du webhook
-        $signature = $request->header('X-FedaPay-Signature');
+        // Vérifier la signature du webhook pour la sécurité (recommandé en production)
+        // $signature = $request->header('X-FedaPay-Signature');
+        // Webhook::constructEvent($request->getContent(), $signature, config('services.fedapay.secret_key'));
 
-        // Traiter l'événement
         $event = $request->all();
 
-        if ($event['name'] === 'transaction.approved') {
+        // On traite l'événement uniquement si c'est une transaction approuvée
+        if (isset($event['name']) && $event['name'] === 'transaction.approved') {
             $transaction = $event['data']['transaction'];
-
             $vote = Vote::where('payment_reference', $transaction['reference'])->first();
 
             if ($vote) {
-                $vote->update([
-                    'payment_status' => 'paid',
-                    'status' => 'confirmed'
-                ]);
-
-                $vote->candidate->increment('votes_count', $vote->votes_number);
+                // On met à jour le statut du vote en utilisant la méthode privée
+                $this->updateVoteStatus($vote, 'approved');
             }
         }
 

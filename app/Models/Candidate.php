@@ -17,16 +17,14 @@ class Candidate extends Model
         
     ];
 
-      public function events(): BelongsTo 
+    public function event(): BelongsTo
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Event::class, 'event_id');
     }
-      public function admins(): BelongsTo 
+
+    public function votes(): HasMany
     {
-        return $this->belongsTo(Admin::class);
-    }
-      public function votes(): HasMany 
-    {
-        return $this->hasMany(Vote::class);
+        return $this->hasMany(Vote::class, 'candidate_id');
     }
 }
+

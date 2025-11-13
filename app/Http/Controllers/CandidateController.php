@@ -8,10 +8,13 @@ use Illuminate\Http\Request;
 class CandidateController extends Controller
 {
     /**
-     * Lister tous les candidats
+     * Affiche la liste de tous les candidats avec leurs événements associés.
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
+        // Récupérer tous les candidats avec leurs événements associés
         $candidates = Candidate::with('event')->get();
 
         return response()->json([
@@ -21,38 +24,63 @@ class CandidateController extends Controller
     }
 
     /**
-     *  Créer un nouveau candidat
+     * Affiche la liste des candidats pour un événement spécifique.
+     *
+     * @param int $event_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getByEvent($event_id)
+    {
+        $candidates = Candidate::where('event_id', $event_id)->with('event')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $candidates,
+        ]);
+    }
+
+    /**
+     * Crée un nouveau candidat.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Validation des données d'entrée
+        $validated = $request ->validate([
             'event_id' => 'required|exists:events,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'photo' => 'required|string|max:5100', // ici on attend juste une URL ou un nom d'image
-            'votes_count' => 'required|int'
+            'photo' => 'required|string|max:5100', // URL ou nom de l'image
         ]);
 
+        // Création du candidat
         $candidate = Candidate::create($validated);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Candidat créé avec succès ',
+            'message' => 'Candidat créé avec succès',
             'data' => $candidate,
         ], 201);
     }
 
     /**
-     * 🔍 Afficher un candidat spécifique
+     * Affiche un candidat spécifique.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
+        // Recherche du candidat avec son événement associé
         $candidate = Candidate::with('event')->find($id);
 
+        // Vérification de l'existence du candidat
         if (!$candidate) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Candidat introuvable ',
+                'message' => 'Candidat introuvable',
             ], 404);
         }
 
@@ -63,55 +91,69 @@ class CandidateController extends Controller
     }
 
     /**
-     *  Mettre à jour un candidat
+     * Met à jour un candidat spécifique.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
+        // Recherche du candidat
         $candidate = Candidate::find($id);
 
+        // Vérification de l'existence du candidat
         if (!$candidate) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Candidat introuvable ',
+                'message' => 'Candidat introuvable',
             ], 404);
         }
 
+        // Validation des données d'entrée
         $validated = $request->validate([
             'event_id' => 'sometimes|exists:events,id',
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'photo' => 'required|string|max:5100',
-            'votes_count' => 'required|int'
+            'photo' => 'sometimes|string|max:5100',
+            'votes_count' => 'sometimes|integer'
         ]);
 
+        // Mise à jour du candidat
         $candidate->update($validated);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Candidat mis à jour avec succès ',
+            'message' => 'Candidat mis à jour avec succès',
             'data' => $candidate,
         ]);
     }
 
     /**
-     *  Supprimer un candidat
+     * Supprime un candidat spécifique.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
+        // Recherche du candidat
         $candidate = Candidate::find($id);
 
+        // Vérification de l'existence du candidat
         if (!$candidate) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Candidat introuvable ',
+                'message' => 'Candidat introuvable',
             ], 404);
         }
 
+        // Suppression du candidat
         $candidate->delete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Candidat supprimé avec succès ',
+            'message' => 'Candidat supprimé avec succès',
         ]);
     }
 }

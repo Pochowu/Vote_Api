@@ -16,14 +16,16 @@ return new class extends Migration
 
             // Clés étrangères
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-            $table->foreignId('candidat_id')->constrained('candidats')->onDelete('cascade');
+            // Utiliser la convention anglaise "candidate_id" et la table "candidates"
+            $table->foreignId('candidate_id')->constrained('candidates')->onDelete('cascade');
 
             // Champs spécifiques au vote
             $table->string('amount');
             $table->string('voting_name')->nullable();
             $table->integer('votes_number')->default(1);
             $table->enum('payment_method', ['mix_by_yas', 'flooz']);
-            $table->string('phone_number')->required();
+            // ->required() n'existe pas sur Blueprint, laisser non-nullable si nécessaire
+            $table->string('phone_number');
 
             $table->timestamps();
         });

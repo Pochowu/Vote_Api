@@ -15,20 +15,26 @@ Route::post('/login', [AdminController::class, 'login']);
 // Liste publique des concours (événements)
 Route::get('/events', [EventController::class, 'index']);
 Route::get('/events/{id}', [EventController::class, 'show']);
+Route::put('/events/{id}', [EventController::class, 'update']);
+Route::delete('/events/{id}', [EventController::class, 'destroy']);
+
+// Création d’un concours
+Route::post('/events', [EventController::class, 'store']);
 
 // Liste des candidats d’un concours
 Route::get('/events/{event_id}/candidates', [CandidateController::class, 'getByEvent']);
 Route::get('/candidates/{id}', [CandidateController::class, 'show']);
 
+
 // Enregistrement d’un vote (sans compte)
 Route::post('/votes', [VoteController::class, 'store']);
 
+// Route::apiResource('/events', EventController::class);
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AdminController::class, 'logout']);
 
     // Gestion des concours
-    Route::apiResource('/events', EventController::class);
 
     // Gestion des candidats
     Route::apiResource('/candidates', CandidateController::class);
@@ -44,7 +50,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Routes pour la gestion des admins
-//Route::apiResource('admins', AdminController::class);
+Route::apiResource('admins', AdminController::class);
 
 Route::prefix('payments')->group(function () {
     Route::post('/initiate', [PaymentController::class, 'initiatePayment']);
