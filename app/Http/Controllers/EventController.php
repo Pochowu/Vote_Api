@@ -31,7 +31,7 @@ class EventController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'nullable|text',
+            'description' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'vote_amount' => 'nullable|string',
@@ -148,22 +148,23 @@ class EventController extends Controller
     */
 
     //  Supprimer un événement
-    public function destroy($id)
-    {
-        $events = Event::find($id);
+    public function destroy(Event $events ,string $id)
+{
+    // $events = Event::find($id);
 
-        if (!$events) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Événement non trouvé'
-            ], 404);
-        }
-
-        $events->delete();
-        
+    if (!$events) {
         return response()->json([
-            'success' => true,
-            'message' => 'Événement supprimé avec succès'
-        ], 200);
+            'success' => false,
+            'message' => 'Événement non trouvé',
+        ], 404);
     }
+
+    $events->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Événement supprimé avec succès',
+    ]);
+}
+
 }
