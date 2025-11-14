@@ -14,17 +14,20 @@ Route::post('/login', [AdminController::class, 'login']);
 
 // Liste publique des concours (événements)
 // Route::get('/events', [EventController::class, 'index']);
-// Route::get('/events/{id}', [EventController::class, 'show']);
+Route::get('/events/{id}', [EventController::class, 'show']);
 
 Route::apiResource('/events', EventController::class);
 Route::apiResource('/candidates', CandidateController::class);
 
 // Liste des candidats d’un concours
-// Route::get('/events/{event_id}/candidates', [CandidateController::class, 'getByEvent']);
-// Route::get('/candidates/{id}', [CandidateController::class, 'show']);
+Route::get('/events/{event_id}/candidates', [CandidateController::class, 'getByEvent']);
+Route::get('/candidates/{id}', [CandidateController::class, 'show']);
 
 // Enregistrement d’un vote (sans compte)
-Route::post('/votes', [VoteController::class, 'store']);
+// Route::post('/votes', [VoteController::class, 'store']);
+// Route::get('/votes', [VoteController::class, 'index']);
+Route::post('/candidates/{candidatId}/votes', [VoteController::class, 'store']);
+Route::apiResource('/votes', VoteController::class);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -37,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     
     // Gestion des votes (consultation / stats)
-    Route::get('/votes', [VoteController::class, 'index']);
+    
     Route::get('/votes/statistics', [VoteController::class, 'statistics']);
 
 });

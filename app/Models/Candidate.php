@@ -17,7 +17,7 @@ class Candidate extends Model
         
     ];
 
-      public function events(): BelongsTo 
+      public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }

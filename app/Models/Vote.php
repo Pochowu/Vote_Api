@@ -17,12 +17,6 @@ class Vote extends Model
         'votes_number',
         'payment_method',
         'phone_number',
-        'payment_reference', // Nouveau
-        'payment_status', // Nouveau: pending, paid, failed
-    ];
-
-    protected $casts = [
-        'payment_status' => 'string'
     ];
 
     public function candidate()
