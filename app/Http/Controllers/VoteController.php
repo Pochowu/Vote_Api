@@ -10,6 +10,11 @@ use Illuminate\Validation\Rule;
 
 class VoteController extends Controller
 {
+    public function index()
+    {
+        $votes = Vote::with(['candidate', 'event'])->get();
+        return response()->json($votes);
+    }
     /**
      * Enregistre un nouveau vote pour un candidat donné.
      *
